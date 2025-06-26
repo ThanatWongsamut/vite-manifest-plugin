@@ -38,7 +38,11 @@ jobs:
         run: pnpm lint
       
       - name: Run tests
-        run: pnpm test
+        run: pnpm test:run
+      
+      - name: Generate coverage report
+        if: matrix.node-version == 20
+        run: pnpm test:coverage
       
       - name: Build package
         run: pnpm build
