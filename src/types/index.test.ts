@@ -44,7 +44,7 @@ describe('ManifestOptions Type', () => {
   it('should validate that fileName is required', () => {
     // This test ensures TypeScript compilation will fail if fileName is missing
     // @ts-expect-error - fileName is required
-    const invalidOptions: ManifestOptions = {
+    const _invalidOptions: ManifestOptions = {
       publicPath: '/static/'
     };
 
