@@ -10,17 +10,17 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
     const manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
 
     for (const key in manifest) {
-      if (Object.prototype.hasOwnProperty.call(manifest, key)) {
-        manifest[key].file = `${options.publicPath ?? "/"}${manifest[key].file}`;
-      }
-    }
+      if (Object.hasOwnProperty.call(manifest, key)) {
+        const publicPath = options.publicPath ?? "/";
+        const separator = publicPath.endsWith('/') ? '' : '/';
+        manifest[key].file = `${publicPath}${separator}${manifest[key].file}`;
 
-    if (manifest['index.html']) {
-      var newCss = []
-      for (var idx in manifest['index.html'].css) {
-        newCss.push(`${options.publicPath ?? "/"}${manifest['index.html'].css[idx]}`)
+        if(Object.hasOwnProperty.call(manifest[key], 'css')) {
+          for (const cssKey in manifest[key].css) {
+            manifest[key].css[cssKey] = `${publicPath}${separator}${manifest[key].css[cssKey]}`;
+          }
+        }
       }
-      manifest['index.html'].css = newCss
     }
 
     writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));

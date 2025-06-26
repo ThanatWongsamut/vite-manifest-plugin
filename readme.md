@@ -63,6 +63,64 @@ export default defineConfig({
   - `utils.test.ts`: Contains tests for utility functions.
 - `dist/`: Build output directory.
 
+## Development
+
+### Available Scripts
+
+- `pnpm build` - Build the package
+- `pnpm test` - Run tests in watch mode
+- `pnpm test:run` - Run tests once
+- `pnpm test:coverage` - Run tests with coverage report
+- `pnpm lint` - Lint the code
+- `pnpm lint:fix` - Lint and fix issues automatically
+- `pnpm clean` - Remove build artifacts
+- `pnpm release` - Bump version and create a release
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment:
+
+### Workflows
+
+1. **CI/CD Pipeline** (`.github/workflows/ci.yml`):
+   - Runs on every push and pull request to `main` and `develop` branches
+   - Tests against Node.js versions 18, 20, and 22
+   - Runs linting, testing, and building
+   - Publishes to npm when a GitHub release is created
+
+2. **Auto Release** (`.github/workflows/release.yml`):
+   - Automatically creates GitHub releases when version in `package.json` changes
+   - Triggers on pushes to `main` branch
+
+### Publishing Process
+
+For maintainers to publish a new version:
+
+1. Create a new branch for the version update:
+   ```bash
+   git checkout -b release/vX.X.X
+   ```
+
+2. Update the version in `package.json`:
+   ```bash
+   pnpm version patch  # for patch version
+   pnpm version minor  # for minor version
+   pnpm version major  # for major version
+   ```
+
+3. Commit and push the version change:
+   ```bash
+   git add package.json
+   git commit -m "chore: bump version to vX.X.X"
+   git push origin release/vX.X.X
+   ```
+
+4. Create a pull request to merge into `main` branch
+
+5. Once merged, the workflow will automatically:
+   - Create a GitHub release
+   - Publish the package to npm
+
 ## Contributing
 
 1. Fork the repository.
