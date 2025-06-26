@@ -1,6 +1,6 @@
 {
   "name": "vite-manifest-plugin",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "This vite plugin will add publich path or url to the vite generated manifest",
   "type": "module",
   "main": "./dist/index.js",
@@ -18,7 +18,13 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint --cache .",
-    "test": "vitest"
+    "lint:fix": "eslint --cache . --fix",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm clean && pnpm build && pnpm test:run",
+    "release": "pnpm version patch && git push && git push --tags"
   },
   "keywords": [
     "vite-plugin",
@@ -35,7 +41,10 @@
     "url": "git+https://github.com/ThanatWongsamut/vite-manifest-plugin.git"
   },
   "devDependencies": {
+    "@eslint/js": "^9.29.0",
     "@types/node": "^20.14.8",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitest/coverage-v8": "3.2.4",
     "eslint": "^9.5.0",
     "tsup": "^8.1.0",

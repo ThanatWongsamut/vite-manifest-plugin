@@ -3,7 +3,6 @@ import { viteManifestPlugin } from './index';
 import { ManifestOptions } from './types';
 import { readFile } from 'fs/promises';
 import { writeFileSync } from 'fs';
-import { resolve } from 'path';
 
 // Mock fs modules
 vi.mock('fs', () => ({

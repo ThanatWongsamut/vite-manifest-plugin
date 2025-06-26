@@ -13,7 +13,8 @@ export default defineConfig({
         '**/*.test.ts',
         '**/*.spec.ts',
         'vitest.config.ts',
-        'tsup.config.ts'
+        'tsup.config.ts',
+        'eslint.config.js'
       ]
     }
   }
