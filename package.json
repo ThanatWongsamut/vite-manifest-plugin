@@ -18,7 +18,13 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint --cache .",
-    "test": "vitest"
+    "lint:fix": "eslint --cache . --fix",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "pnpm clean && pnpm build && pnpm test:run",
+    "release": "pnpm version patch && git push && git push --tags"
   },
   "keywords": [
     "vite-plugin",
