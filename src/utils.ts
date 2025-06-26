@@ -12,6 +12,12 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
     for (const key in manifest) {
       if (Object.prototype.hasOwnProperty.call(manifest, key)) {
         manifest[key].file = `${options.publicPath ?? "/"}${manifest[key].file}`;
+
+        if(manifest[key].hasOwnProperty('css')) {
+          for (const cssKey in manifest[key].css) {
+            manifest[key].css[cssKey] = `${options.publicPath ?? "/"}${manifest[key].css[cssKey]}`;
+          }
+        }
       }
     }
 
