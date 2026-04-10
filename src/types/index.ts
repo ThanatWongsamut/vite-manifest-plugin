@@ -37,4 +37,6 @@ export type ManifestOptions = {
   map?: (entry: ManifestEntry) => ManifestEntry;
   /** Path prefix prepended to all manifest keys. */
   basePath?: string;
+  /** RegExp to remove hashes from manifest keys. Set to false to disable. Defaults to /([a-f0-9]{8}\.?)/gi. */
+  removeKeyHash?: RegExp | false;
 }
