@@ -4,6 +4,11 @@ import { readFile } from 'fs/promises';
 
 import { ManifestOptions, ManifestValue } from "./types";
 
+const prependPath = (publicPath: string, filePath: string): string => {
+  const separator = publicPath.endsWith('/') ? '' : '/';
+  return `${publicPath}${separator}${filePath}`;
+};
+
 export const modifiedManifest = async (outputPath: string | undefined, options: ManifestOptions): Promise<void> => {
   try {
     const manifestPath = resolve(`${outputPath ?? ""}/${options.fileName}`);
@@ -17,6 +22,7 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
 
     const result: Record<string, ManifestValue> = {};
     const basePath = options.basePath ?? '';
+    const publicPath = options.publicPath ?? "/";
 
     for (const key in manifest) {
       if (Object.hasOwnProperty.call(manifest, key)) {
@@ -24,19 +30,17 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
           continue;
         }
 
-        const publicPath = options.publicPath ?? "/";
-        const separator = publicPath.endsWith('/') ? '' : '/';
-        manifest[key].file = `${publicPath}${separator}${manifest[key].file}`;
+        manifest[key].file = prependPath(publicPath, manifest[key].file);
 
         if(Object.hasOwnProperty.call(manifest[key], 'css')) {
           for (const cssKey in manifest[key].css) {
-            manifest[key].css[cssKey] = `${publicPath}${separator}${manifest[key].css[cssKey]}`;
+            manifest[key].css[cssKey] = prependPath(publicPath, manifest[key].css[cssKey]);
           }
         }
 
         if(Object.hasOwnProperty.call(manifest[key], 'assets')) {
           for (const assetKey in manifest[key].assets) {
-            manifest[key].assets[assetKey] = `${publicPath}${separator}${manifest[key].assets[assetKey]}`;
+            manifest[key].assets[assetKey] = prependPath(publicPath, manifest[key].assets[assetKey]);
           }
         }
 
