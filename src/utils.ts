@@ -52,9 +52,11 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
       }
     }
 
+    const finalResult: Record<string, unknown> = options.seed ? { ...options.seed, ...result } : result;
+
     const output = options.serialize
-      ? options.serialize(result)
-      : JSON.stringify(result, null, 2);
+      ? options.serialize(finalResult as Record<string, ManifestValue>)
+      : JSON.stringify(finalResult, null, 2);
 
     writeFileSync(manifestPath, output);
   } catch (error) {
