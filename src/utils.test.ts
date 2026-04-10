@@ -443,6 +443,73 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should remove hashes from keys with removeKeyHash', async () => {
+        const mockManifest = {
+            "assets/main-a1b2c3d4.js": { "file": "assets/main-a1b2c3d4.js" },
+            "assets/vendor-e5f6a7b8.js": { "file": "assets/vendor-e5f6a7b8.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            removeKeyHash: /[-][a-f0-9]{8}/gi
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "assets/main.js": { "file": "/static/assets/main-a1b2c3d4.js" },
+                "assets/vendor.js": { "file": "/static/assets/vendor-e5f6a7b8.js" }
+            }, null, 2)
+        );
+    });
+
+    it('should not remove hashes when removeKeyHash is false', async () => {
+        const mockManifest = {
+            "assets/main-a1b2c3d4.js": { "file": "assets/main-a1b2c3d4.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            removeKeyHash: false
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "assets/main-a1b2c3d4.js": { "file": "/static/assets/main-a1b2c3d4.js" }
+            }, null, 2)
+        );
+    });
+
+    it('should not modify keys when removeKeyHash is not provided', async () => {
+        const mockManifest = {
+            "assets/main-a1b2c3d4.js": { "file": "assets/main-a1b2c3d4.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/'
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "assets/main-a1b2c3d4.js": { "file": "/static/assets/main-a1b2c3d4.js" }
+            }, null, 2)
+        );
+    });
+
     it('should handle empty manifest', async () => {
         const mockManifest = {};
         const options: ManifestOptions = {

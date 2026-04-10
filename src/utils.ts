@@ -35,12 +35,18 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
           }
         }
 
+        let processedKey = key;
+        if (options.removeKeyHash !== false && options.removeKeyHash) {
+          options.removeKeyHash.lastIndex = 0;
+          processedKey = key.replace(options.removeKeyHash, '');
+        }
+
         if (options.map) {
-          const mapped = options.map({ key, value: manifest[key] });
+          const mapped = options.map({ key: processedKey, value: manifest[key] });
           const newKey = basePath ? `${basePath}${mapped.key}` : mapped.key;
           result[newKey] = mapped.value;
         } else {
-          const newKey = basePath ? `${basePath}${key}` : key;
+          const newKey = basePath ? `${basePath}${processedKey}` : processedKey;
           result[newKey] = manifest[key];
         }
       }
