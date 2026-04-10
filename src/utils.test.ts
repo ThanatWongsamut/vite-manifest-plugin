@@ -70,11 +70,11 @@ describe('modifiedManifest', () => {
 
     it('should handle CSS files in manifest entries', async () => {
         const mockManifest = {
-            "main.js": { 
+            "main.js": {
                 "file": "main.js",
                 "css": ["styles.css", "theme.css"]
             },
-            "vendor.js": { 
+            "vendor.js": {
                 "file": "vendor.js",
                 "css": ["vendor.css"]
             }
@@ -91,11 +91,11 @@ describe('modifiedManifest', () => {
         expect(writeFileSync).toHaveBeenCalledWith(
             'dist/manifest.json',
             JSON.stringify({
-                "main.js": { 
+                "main.js": {
                     "file": "/assets/main.js",
                     "css": ["/assets/styles.css", "/assets/theme.css"]
                 },
-                "vendor.js": { 
+                "vendor.js": {
                     "file": "/assets/vendor.js",
                     "css": ["/assets/vendor.css"]
                 }
@@ -165,11 +165,11 @@ describe('modifiedManifest', () => {
                 "file": "index.html",
                 "css": ["main.css"]
             },
-            "main.js": { 
+            "main.js": {
                 "file": "assets/main-abc123.js",
                 "css": ["assets/main-def456.css"]
             },
-            "vendor.js": { 
+            "vendor.js": {
                 "file": "assets/vendor-789xyz.js"
             },
             "polyfills.js": {
@@ -193,11 +193,11 @@ describe('modifiedManifest', () => {
                     "file": "https://cdn.example.com/index.html",
                     "css": ["https://cdn.example.com/main.css"]
                 },
-                "main.js": { 
+                "main.js": {
                     "file": "https://cdn.example.com/assets/main-abc123.js",
                     "css": ["https://cdn.example.com/assets/main-def456.css"]
                 },
-                "vendor.js": { 
+                "vendor.js": {
                     "file": "https://cdn.example.com/assets/vendor-789xyz.js"
                 },
                 "polyfills.js": {
@@ -303,6 +303,79 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should transform entries with map option', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js" },
+            "vendor.js": { "file": "assets/vendor.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            map: (entry) => ({
+                key: entry.key.toUpperCase(),
+                value: { ...entry.value, mapped: true }
+            })
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "MAIN.JS": { "file": "/static/assets/main.js", "mapped": true },
+                "VENDOR.JS": { "file": "/static/assets/vendor.js", "mapped": true }
+            }, null, 2)
+        );
+    });
+
+    it('should apply map after path rewriting', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js" }
+        };
+        const mapFn = vi.fn((entry) => entry);
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            map: mapFn
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(mapFn).toHaveBeenCalledWith({
+            key: 'main.js',
+            value: { file: '/static/assets/main.js' }
+        });
+    });
+
+    it('should allow map to rename keys', async () => {
+        const mockManifest = {
+            "src/main.js": { "file": "assets/main.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            map: (entry) => ({
+                key: entry.key.replace('src/', ''),
+                value: entry.value
+            })
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": { "file": "/static/assets/main.js" }
+            }, null, 2)
+        );
+    });
+
     it('should handle empty manifest', async () => {
         const mockManifest = {};
         const options: ManifestOptions = {
@@ -397,7 +470,7 @@ describe('modifiedManifest', () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledWith('An error occurred:', expect.any(SyntaxError));
         expect(writeFileSync).not.toHaveBeenCalled();
-        
+
         consoleErrorSpy.mockRestore();
     });
 
@@ -414,7 +487,7 @@ describe('modifiedManifest', () => {
         expect(readFile).toHaveBeenCalledWith('output/manifest.json', 'utf-8');
         expect(consoleErrorSpy).toHaveBeenCalledWith('An error occurred:', expect.any(Error));
         expect(writeFileSync).not.toHaveBeenCalled();
-        
+
         consoleErrorSpy.mockRestore();
     });
 
@@ -429,11 +502,11 @@ describe('modifiedManifest', () => {
         });
 
         await modifiedManifest('invalidPath', options);
-        
+
         expect(consoleErrorSpy).toHaveBeenCalledWith('An error occurred:', expect.any(Error));
         expect(readFile).not.toHaveBeenCalled();
         expect(writeFileSync).not.toHaveBeenCalled();
-        
+
         consoleErrorSpy.mockRestore();
     });
 
