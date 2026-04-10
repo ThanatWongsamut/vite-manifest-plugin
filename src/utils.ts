@@ -52,7 +52,11 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
       }
     }
 
-    writeFileSync(manifestPath, JSON.stringify(result, null, 2));
+    const output = options.serialize
+      ? options.serialize(result)
+      : JSON.stringify(result, null, 2);
+
+    writeFileSync(manifestPath, output);
   } catch (error) {
     console.error('An error occurred:', error);
     // Continue running the program
