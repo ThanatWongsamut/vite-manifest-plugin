@@ -10,6 +10,7 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
     const manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
 
     const result: Record<string, ManifestValue> = {};
+    const basePath = options.basePath ?? '';
 
     for (const key in manifest) {
       if (Object.hasOwnProperty.call(manifest, key)) {
@@ -36,9 +37,11 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
 
         if (options.map) {
           const mapped = options.map({ key, value: manifest[key] });
-          result[mapped.key] = mapped.value;
+          const newKey = basePath ? `${basePath}${mapped.key}` : mapped.key;
+          result[newKey] = mapped.value;
         } else {
-          result[key] = manifest[key];
+          const newKey = basePath ? `${basePath}${key}` : key;
+          result[newKey] = manifest[key];
         }
       }
     }

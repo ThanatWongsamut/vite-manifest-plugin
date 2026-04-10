@@ -35,4 +35,6 @@ export type ManifestOptions = {
   filter?: (entry: ManifestEntry) => boolean;
   /** Map function to transform manifest entries after path rewriting. */
   map?: (entry: ManifestEntry) => ManifestEntry;
+  /** Path prefix prepended to all manifest keys. */
+  basePath?: string;
 }
