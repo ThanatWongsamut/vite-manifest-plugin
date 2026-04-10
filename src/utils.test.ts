@@ -225,6 +225,70 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should handle assets array in manifest entries', async () => {
+        const mockManifest = {
+            "main.js": {
+                "file": "assets/main-abc123.js",
+                "assets": ["assets/logo-def456.png", "assets/font-ghi789.woff2"]
+            },
+            "vendor.js": {
+                "file": "assets/vendor-xyz.js",
+                "assets": ["assets/icon-abc.svg"]
+            }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/'
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": {
+                    "file": "/static/assets/main-abc123.js",
+                    "assets": ["/static/assets/logo-def456.png", "/static/assets/font-ghi789.woff2"]
+                },
+                "vendor.js": {
+                    "file": "/static/assets/vendor-xyz.js",
+                    "assets": ["/static/assets/icon-abc.svg"]
+                }
+            }, null, 2)
+        );
+    });
+
+    it('should handle manifest entries with both css and assets', async () => {
+        const mockManifest = {
+            "main.js": {
+                "file": "assets/main-abc123.js",
+                "css": ["assets/main-def456.css"],
+                "assets": ["assets/logo-ghi789.png"]
+            }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: 'https://cdn.example.com/'
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": {
+                    "file": "https://cdn.example.com/assets/main-abc123.js",
+                    "css": ["https://cdn.example.com/assets/main-def456.css"],
+                    "assets": ["https://cdn.example.com/assets/logo-ghi789.png"]
+                }
+            }, null, 2)
+        );
+    });
+
     it('should handle invalid JSON in manifest file', async () => {
         const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
         const options: ManifestOptions = {
