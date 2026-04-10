@@ -66,6 +66,7 @@ export default defineConfig({
 | `publicPath` | `string` | `'/'` | The public path to prepend to the file paths in the manifest. |
 | `filter` | `(entry: ManifestEntry) => boolean` | `undefined` | Filter function to include/exclude manifest entries. Return `true` to keep the entry. |
 | `map` | `(entry: ManifestEntry) => ManifestEntry` | `undefined` | Transform function applied to each manifest entry after path rewriting. Can modify keys and values. |
+| `basePath` | `string` | `''` | Path prefix prepended to all manifest keys. |
 
 The `ManifestEntry` type:
 
@@ -99,6 +100,18 @@ viteManifestPlugin({
     value: entry.value,
   }),
 })
+```
+
+#### BasePath Example
+
+```ts
+viteManifestPlugin({
+  fileName: 'manifest.json',
+  publicPath: '/static/',
+  // Prefix all keys with "dist/"
+  basePath: 'dist/',
+})
+// Result: { "dist/main.js": { "file": "/static/main.js" } }
 ```
 
 ## Project Structure
