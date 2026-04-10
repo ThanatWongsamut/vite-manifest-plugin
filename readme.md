@@ -68,6 +68,7 @@ export default defineConfig({
 | `map` | `(entry: ManifestEntry) => ManifestEntry` | `undefined` | Transform function applied to each manifest entry after path rewriting. Can modify keys and values. |
 | `basePath` | `string` | `''` | Path prefix prepended to all manifest keys. |
 | `removeKeyHash` | `RegExp \| false` | `undefined` | RegExp to strip hashes from manifest keys. Set to `false` to explicitly disable. |
+| `serialize` | `(manifest: Record<string, ManifestValue>) => string` | `undefined` | Custom serialization function. Defaults to `JSON.stringify` with 2-space indent. |
 
 The `ManifestEntry` type:
 
@@ -123,6 +124,19 @@ viteManifestPlugin({
   publicPath: '/static/',
   // Remove 8-char hex hashes from keys: "assets/main-a1b2c3d4.js" → "assets/main.js"
   removeKeyHash: /[-][a-f0-9]{8}/gi,
+})
+```
+
+#### Serialize Example
+
+```ts
+import yaml from 'js-yaml';
+
+viteManifestPlugin({
+  fileName: 'manifest.yaml',
+  publicPath: '/static/',
+  // Output as YAML instead of JSON
+  serialize: (manifest) => yaml.dump(manifest),
 })
 ```
 
