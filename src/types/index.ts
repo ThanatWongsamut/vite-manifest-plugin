@@ -39,4 +39,6 @@ export type ManifestOptions = {
   basePath?: string;
   /** RegExp to remove hashes from manifest keys. Set to false to disable. Defaults to /([a-f0-9]{8}\.?)/gi. */
   removeKeyHash?: RegExp | false;
+  /** Custom serialization function. Defaults to JSON.stringify with 2-space indent. */
+  serialize?: (manifest: Record<string, ManifestValue>) => string;
 }

@@ -510,6 +510,45 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should use custom serialize function', async () => {
+        const mockManifest = {
+            "main.js": { "file": "main.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            serialize: (manifest) => `# Custom\n${JSON.stringify(manifest)}`
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            '# Custom\n{"main.js":{"file":"/static/main.js"}}'
+        );
+    });
+
+    it('should use default JSON serialization when serialize is not provided', async () => {
+        const mockManifest = {
+            "main.js": { "file": "main.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/'
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({ "main.js": { "file": "/static/main.js" } }, null, 2)
+        );
+    });
+
     it('should handle empty manifest', async () => {
         const mockManifest = {};
         const options: ManifestOptions = {
