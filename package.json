@@ -33,9 +33,6 @@
   ],
   "author": "thanat.wongamut",
   "license": "ISC",
-  "dependencies": {
-    "typescript": "^5.5.2"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ThanatWongsamut/vite-manifest-plugin.git"
@@ -48,6 +45,7 @@
     "@vitest/coverage-v8": "3.2.4",
     "eslint": "^9.5.0",
     "tsup": "^8.1.0",
+    "typescript": "^5.5.2",
     "vite": "^5.3.1",
     "vitest": "^3.2.4"
   }
