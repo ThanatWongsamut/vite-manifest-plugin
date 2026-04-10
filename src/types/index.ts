@@ -43,4 +43,6 @@ export type ManifestOptions = {
   serialize?: (manifest: Record<string, ManifestValue>) => string;
   /** Initial key/value pairs to merge into the manifest. */
   seed?: Record<string, unknown>;
+  /** Custom function to generate the entire manifest object. Receives the seed and processed files. When provided, skips default path rewriting. */
+  generate?: (seed: Record<string, unknown>, files: Record<string, ManifestValue>) => Record<string, unknown>;
 }

@@ -70,6 +70,7 @@ export default defineConfig({
 | `removeKeyHash` | `RegExp \| false` | `undefined` | RegExp to strip hashes from manifest keys. Set to `false` to explicitly disable. |
 | `serialize` | `(manifest: Record<string, ManifestValue>) => string` | `undefined` | Custom serialization function. Defaults to `JSON.stringify` with 2-space indent. |
 | `seed` | `Record<string, unknown>` | `undefined` | Initial key/value pairs merged into the manifest. Build entries take precedence over seed keys. |
+| `generate` | `(seed: Record<string, unknown>, files: Record<string, ManifestValue>) => Record<string, unknown>` | `undefined` | Custom function to generate the entire manifest. When provided, skips default path rewriting. |
 
 The `ManifestEntry` type:
 
@@ -149,6 +150,23 @@ viteManifestPlugin({
   publicPath: '/static/',
   // Inject custom metadata into the manifest
   seed: { version: '1.0.0', buildTime: new Date().toISOString() },
+})
+```
+
+#### Generate Example
+
+```ts
+viteManifestPlugin({
+  fileName: 'manifest.json',
+  seed: { version: '1.0.0' },
+  // Flatten manifest to simple key→path mapping
+  generate: (seed, files) => {
+    const result = { ...seed };
+    for (const key in files) {
+      result[key] = files[key].file;
+    }
+    return result;
+  },
 })
 ```
 
