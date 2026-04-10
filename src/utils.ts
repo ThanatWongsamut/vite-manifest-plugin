@@ -9,6 +9,12 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
     const manifestPath = resolve(`${outputPath ?? ""}/${options.fileName}`);
     const manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
 
+    if (options.generate) {
+      const result = options.generate(options.seed ?? {}, manifest);
+      writeFileSync(manifestPath, JSON.stringify(result, null, 2));
+      return;
+    }
+
     const result: Record<string, ManifestValue> = {};
     const basePath = options.basePath ?? '';
 
