@@ -21,7 +21,6 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
     for (const key in manifest) {
       if (Object.hasOwnProperty.call(manifest, key)) {
         if (options.filter && !options.filter({ key, value: manifest[key] })) {
-          delete manifest[key];
           continue;
         }
 
