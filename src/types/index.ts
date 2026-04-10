@@ -33,4 +33,6 @@ export type ManifestOptions = {
   publicPath?: string;
   /** Filter function to include/exclude manifest entries. Return true to keep the entry. */
   filter?: (entry: ManifestEntry) => boolean;
+  /** Map function to transform manifest entries after path rewriting. */
+  map?: (entry: ManifestEntry) => ManifestEntry;
 }
