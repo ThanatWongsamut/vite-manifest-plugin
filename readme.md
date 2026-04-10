@@ -67,6 +67,7 @@ export default defineConfig({
 | `filter` | `(entry: ManifestEntry) => boolean` | `undefined` | Filter function to include/exclude manifest entries. Return `true` to keep the entry. |
 | `map` | `(entry: ManifestEntry) => ManifestEntry` | `undefined` | Transform function applied to each manifest entry after path rewriting. Can modify keys and values. |
 | `basePath` | `string` | `''` | Path prefix prepended to all manifest keys. |
+| `removeKeyHash` | `RegExp \| false` | `undefined` | RegExp to strip hashes from manifest keys. Set to `false` to explicitly disable. |
 
 The `ManifestEntry` type:
 
@@ -112,6 +113,17 @@ viteManifestPlugin({
   basePath: 'dist/',
 })
 // Result: { "dist/main.js": { "file": "/static/main.js" } }
+```
+
+#### RemoveKeyHash Example
+
+```ts
+viteManifestPlugin({
+  fileName: 'manifest.json',
+  publicPath: '/static/',
+  // Remove 8-char hex hashes from keys: "assets/main-a1b2c3d4.js" → "assets/main.js"
+  removeKeyHash: /[-][a-f0-9]{8}/gi,
+})
 ```
 
 ## Project Structure
