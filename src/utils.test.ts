@@ -208,6 +208,101 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should filter out entries when filter returns false', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js" },
+            "vendor.js": { "file": "assets/vendor.js" },
+            "polyfills.js": { "file": "assets/polyfills.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            filter: (entry) => entry.key !== 'polyfills.js'
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": { "file": "/static/assets/main.js" },
+                "vendor.js": { "file": "/static/assets/vendor.js" }
+            }, null, 2)
+        );
+    });
+
+    it('should keep all entries when filter always returns true', async () => {
+        const mockManifest = {
+            "main.js": { "file": "main.js" },
+            "vendor.js": { "file": "vendor.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            filter: () => true
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": { "file": "/static/main.js" },
+                "vendor.js": { "file": "/static/vendor.js" }
+            }, null, 2)
+        );
+    });
+
+    it('should remove all entries when filter always returns false', async () => {
+        const mockManifest = {
+            "main.js": { "file": "main.js" },
+            "vendor.js": { "file": "vendor.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            filter: () => false
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({}, null, 2)
+        );
+    });
+
+    it('should filter based on entry value properties', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js", "isEntry": true },
+            "vendor.js": { "file": "assets/vendor.js" },
+            "style.css": { "file": "assets/style.css", "isEntry": true }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            filter: (entry) => entry.value.isEntry === true
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "main.js": { "file": "/static/assets/main.js", "isEntry": true },
+                "style.css": { "file": "/static/assets/style.css", "isEntry": true }
+            }, null, 2)
+        );
+    });
+
     it('should handle empty manifest', async () => {
         const mockManifest = {};
         const options: ManifestOptions = {
