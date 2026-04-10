@@ -2,12 +2,14 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 import { readFile } from 'fs/promises';
 
-import { ManifestOptions } from "./types";
+import { ManifestOptions, ManifestValue } from "./types";
 
 export const modifiedManifest = async (outputPath: string | undefined, options: ManifestOptions): Promise<void> => {
   try {
     const manifestPath = resolve(`${outputPath ?? ""}/${options.fileName}`);
     const manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
+
+    const result: Record<string, ManifestValue> = {};
 
     for (const key in manifest) {
       if (Object.hasOwnProperty.call(manifest, key)) {
@@ -31,10 +33,17 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
             manifest[key].assets[assetKey] = `${publicPath}${separator}${manifest[key].assets[assetKey]}`;
           }
         }
+
+        if (options.map) {
+          const mapped = options.map({ key, value: manifest[key] });
+          result[mapped.key] = mapped.value;
+        } else {
+          result[key] = manifest[key];
+        }
       }
     }
 
-    writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+    writeFileSync(manifestPath, JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('An error occurred:', error);
     // Continue running the program

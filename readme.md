@@ -65,13 +65,14 @@ export default defineConfig({
 | `fileName` | `string` | — | **Required.** The name of the manifest file. |
 | `publicPath` | `string` | `'/'` | The public path to prepend to the file paths in the manifest. |
 | `filter` | `(entry: ManifestEntry) => boolean` | `undefined` | Filter function to include/exclude manifest entries. Return `true` to keep the entry. |
+| `map` | `(entry: ManifestEntry) => ManifestEntry` | `undefined` | Transform function applied to each manifest entry after path rewriting. Can modify keys and values. |
 
 The `ManifestEntry` type:
 
 ```ts
 type ManifestEntry = {
   key: string;                  // The manifest key (e.g., "src/main.js")
-  value: Record<string, any>;   // The manifest value object
+  value: ManifestValue;         // The manifest value object
 }
 ```
 
@@ -83,6 +84,20 @@ viteManifestPlugin({
   publicPath: '/static/',
   // Only include entry points
   filter: (entry) => entry.value.isEntry === true,
+})
+```
+
+#### Map Example
+
+```ts
+viteManifestPlugin({
+  fileName: 'manifest.json',
+  publicPath: '/static/',
+  // Strip "src/" prefix from manifest keys
+  map: (entry) => ({
+    key: entry.key.replace('src/', ''),
+    value: entry.value,
+  }),
 })
 ```
 
