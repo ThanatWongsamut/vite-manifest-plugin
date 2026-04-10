@@ -41,4 +41,6 @@ export type ManifestOptions = {
   removeKeyHash?: RegExp | false;
   /** Custom serialization function. Defaults to JSON.stringify with 2-space indent. */
   serialize?: (manifest: Record<string, ManifestValue>) => string;
+  /** Initial key/value pairs to merge into the manifest. */
+  seed?: Record<string, unknown>;
 }
