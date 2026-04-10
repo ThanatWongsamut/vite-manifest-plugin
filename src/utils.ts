@@ -20,6 +20,12 @@ export const modifiedManifest = async (outputPath: string | undefined, options: 
             manifest[key].css[cssKey] = `${publicPath}${separator}${manifest[key].css[cssKey]}`;
           }
         }
+
+        if(Object.hasOwnProperty.call(manifest[key], 'assets')) {
+          for (const assetKey in manifest[key].assets) {
+            manifest[key].assets[assetKey] = `${publicPath}${separator}${manifest[key].assets[assetKey]}`;
+          }
+        }
       }
     }
 
