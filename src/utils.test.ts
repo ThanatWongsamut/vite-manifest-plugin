@@ -617,6 +617,76 @@ describe('modifiedManifest', () => {
         );
     });
 
+    it('should use generate function for custom manifest output', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js" },
+            "vendor.js": { "file": "assets/vendor.js" }
+        };
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            generate: (seed, files) => {
+                const result: Record<string, string> = { ...seed as Record<string, string> };
+                for (const key in files) {
+                    result[key] = files[key].file;
+                }
+                return result;
+            },
+            seed: { "version": "1.0.0" }
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(writeFileSync).toHaveBeenCalledWith(
+            'dist/manifest.json',
+            JSON.stringify({
+                "version": "1.0.0",
+                "main.js": "assets/main.js",
+                "vendor.js": "assets/vendor.js"
+            }, null, 2)
+        );
+    });
+
+    it('should skip path rewriting when generate is provided', async () => {
+        const mockManifest = {
+            "main.js": { "file": "assets/main.js" }
+        };
+        const generateFn = vi.fn((_seed, files) => files);
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            publicPath: '/static/',
+            generate: generateFn
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        // generate receives raw files (no path rewriting applied)
+        expect(generateFn).toHaveBeenCalledWith(
+            {},
+            { "main.js": { "file": "assets/main.js" } }
+        );
+    });
+
+    it('should pass empty seed to generate when seed is not provided', async () => {
+        const mockManifest = {
+            "main.js": { "file": "main.js" }
+        };
+        const generateFn = vi.fn((seed) => seed);
+        const options: ManifestOptions = {
+            fileName: 'manifest.json',
+            generate: generateFn
+        };
+
+        (readFile as any).mockResolvedValue(JSON.stringify(mockManifest));
+
+        await modifiedManifest('dist', options);
+
+        expect(generateFn).toHaveBeenCalledWith({}, expect.any(Object));
+    });
+
     it('should handle empty manifest', async () => {
         const mockManifest = {};
         const options: ManifestOptions = {
